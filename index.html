@@ -277,15 +277,15 @@
         </div>
 
         <div class="info-box">
-            💡 <strong>IMPORTANT:</strong> This tool will open the login page in a new window and automatically click the "Sign in" button repeatedly. Keep both windows open!
+            💡 <strong>FIXED:</strong> Now automatically fills your username before each attempt!
         </div>
 
         <div class="warning-box">
-            ⚠️ <strong>Note:</strong> You need to manually enter your student number in the popup window once, then let the automation click the button for you.
+            ⚠️ <strong>How it works:</strong> Opens login page, fills your student number automatically, clicks button repeatedly until successful!
         </div>
 
         <div class="form-group">
-            <label for="username">Your Student Number (for your reference)</label>
+            <label for="username">Your Student Number</label>
             <input 
                 type="text" 
                 id="username" 
@@ -301,9 +301,9 @@
                     <input 
                         type="number" 
                         id="maxAttempts" 
-                        value="50" 
+                        value="100" 
                         min="1" 
-                        max="200"
+                        max="500"
                     >
                 </div>
                 <div class="settings-item">
@@ -320,7 +320,7 @@
         </div>
 
         <div class="button-group">
-            <button class="btn-start" id="startBtn" onclick="startAutomation()">Open Login & Start</button>
+            <button class="btn-start" id="startBtn" onclick="startAutomation()">Start Automation</button>
             <button class="btn-reset" id="resetBtn" onclick="resetForm()">Reset</button>
         </div>
 
@@ -329,7 +329,7 @@
         <div class="status-section">
             <div class="status-label">📊 Status</div>
             <div class="status-display" id="statusDisplay">
-                Click "Open Login & Start" to begin automation.
+                Enter your student number and click "Start Automation".
             </div>
             <div class="attempt-counter" id="attemptCounter" style="display: none;">
                 <span class="attempt-label">Attempts:</span>
@@ -341,25 +341,27 @@
     <script>
         let isAutomating = false;
         let currentAttempt = 0;
-        let maxAttempts = 50;
+        let maxAttempts = 100;
         let delay = 2;
         let loginWindow = null;
         let automationInterval = null;
+        let studentNumber = '';
 
         const LOGIN_URL = "http://www.science.kln.ac.lk:8080/sfkn.aspx";
 
         function startAutomation() {
-            const username = document.getElementById('username').value.trim();
+            studentNumber = document.getElementById('username').value.trim();
             
-            if (!username) {
-                updateStatus('<span class="status-error">❌ Note: You can leave the field empty. Click "Open Login & Start" to begin.</span>');
+            if (!studentNumber) {
+                updateStatus('<span class="status-error">❌ Error: Please enter your student number!</span>');
+                return;
             }
 
-            maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 50;
+            maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 100;
             delay = parseInt(document.getElementById('delay').value) || 2;
 
             // Open the login page in a new window
-            loginWindow = window.open(LOGIN_URL, 'LoginWindow', 'width=800,height=600');
+            loginWindow = window.open(LOGIN_URL, 'LoginWindow', 'width=900,height=700');
 
             if (!loginWindow) {
                 updateStatus('<span class="status-error">❌ Error: Please allow popups for this site!</span>');
@@ -377,29 +379,29 @@
             document.getElementById('delay').disabled = true;
             document.getElementById('attemptCounter').style.display = 'flex';
 
-            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Login window opened! Please enter your student number and then close this message. The automation will start clicking automatically...</span>');
+            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Waiting for login page to fully load...</span>');
 
-            // Wait for user to enter credentials, then start automation
+            // Wait for page to load then start automation
             setTimeout(() => {
-                startClickingLoop();
-            }, 3000);
+                startAutomationLoop();
+            }, 2000);
         }
 
-        function startClickingLoop() {
-            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Waiting for login page to load...</span>');
+        function startAutomationLoop() {
+            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Starting automated login attempts...</span>');
 
-            // Start the automated clicking
+            // Start the automated process
             automationInterval = setInterval(() => {
                 if (!isAutomating || !loginWindow || loginWindow.closed) {
                     stopAutomation();
                     return;
                 }
 
-                performClick();
+                performLoginAttempt();
             }, delay * 1000);
         }
 
-        function performClick() {
+        function performLoginAttempt() {
             if (!isAutomating || currentAttempt >= maxAttempts) {
                 if (isAutomating && currentAttempt >= maxAttempts) {
                     updateStatus(`<span class="status-error">❌ Maximum attempts (${maxAttempts}) reached. The system may require manual verification.</span>`);
@@ -411,7 +413,7 @@
             currentAttempt++;
             document.getElementById('attemptNumber').textContent = currentAttempt;
 
-            updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Clicking "Sign in" button...</span>`);
+            updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Filling form and clicking...</span>`);
 
             try {
                 // Access the login window's document
@@ -422,18 +424,40 @@
                     return;
                 }
 
-                // Find and click the login button
+                // Get form fields
+                const usernameField = doc.getElementById('Usernametxt');
+                const passwordField = doc.getElementById('PasswordTxt');
                 const loginButton = doc.getElementById('LoginBt');
-                if (loginButton) {
-                    loginButton.click();
-                    
-                    // Check if login was successful
-                    setTimeout(() => {
-                        checkSuccess();
-                    }, 500);
-                } else {
-                    console.warn('Login button not found');
+
+                if (!usernameField || !passwordField || !loginButton) {
+                    console.warn('Form fields not found');
+                    return;
                 }
+
+                // Fill the username field
+                usernameField.value = '';
+                usernameField.value = studentNumber;
+                
+                // Trigger input events
+                usernameField.dispatchEvent(new Event('change', { bubbles: true }));
+                usernameField.dispatchEvent(new Event('input', { bubbles: true }));
+                usernameField.dispatchEvent(new Event('blur', { bubbles: true }));
+
+                // Clear password field
+                passwordField.value = '';
+                passwordField.dispatchEvent(new Event('change', { bubbles: true }));
+
+                // Click the login button
+                setTimeout(() => {
+                    if (loginButton) {
+                        loginButton.click();
+                        
+                        // Check for success after a delay
+                        setTimeout(() => {
+                            checkSuccess();
+                        }, 1000);
+                    }
+                }, 200);
 
             } catch (error) {
                 console.error('Error:', error);
@@ -447,17 +471,19 @@
                 const doc = loginWindow.document;
                 const pageContent = doc.body.innerText.toLowerCase();
 
-                // Check for success indicators
+                // Check for success indicators (dashboard, registration, etc.)
                 if (pageContent.includes('logout') || 
                     pageContent.includes('sign out') || 
                     pageContent.includes('registration') ||
                     pageContent.includes('exam admission') ||
-                    pageContent.includes('student name')) {
+                    pageContent.includes('student name') ||
+                    pageContent.includes('student id')) {
                     
                     updateStatus(`<span class="status-success">✓ LOGIN SUCCESSFUL on attempt ${currentAttempt}!</span>`);
                     isAutomating = false;
                     clearInterval(automationInterval);
                     finishAutomation();
+                    loginWindow.focus();
                 }
             } catch (error) {
                 console.error('Error checking success:', error);
@@ -493,15 +519,16 @@
             }
 
             document.getElementById('username').value = '';
-            document.getElementById('maxAttempts').value = '50';
+            document.getElementById('maxAttempts').value = '100';
             document.getElementById('delay').value = '2';
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
             document.getElementById('resetBtn').style.display = 'none';
             document.getElementById('attemptCounter').style.display = 'none';
-            document.getElementById('statusDisplay').innerHTML = 'Click "Open Login & Start" to begin automation.';
+            document.getElementById('statusDisplay').innerHTML = 'Enter your student number and click "Start Automation".';
             currentAttempt = 0;
             loginWindow = null;
+            studentNumber = '';
         }
 
         function updateStatus(html) {
