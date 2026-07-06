@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Login Retry System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-stop {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #ff5252;
+        }
+
+        .btn-stop:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #ff6b6b;
+        }
+
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+        }
+
+        .status-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+
+        .status-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-display {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+        }
+
+        .attempt-counter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .attempt-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .attempt-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .status-success {
+            color: #27ae60;
+            background: #d5f4e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .status-error {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .status-info {
+            color: #3498db;
+            background: #d6eaf8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .settings {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .settings h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .settings-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-item small {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Faculty Login Retry</h1>
+            <p>Faculty of Science - University of Kelaniya</p>
+        </div>
+
+        <div class="info-box">
+            💡 <strong>How it works:</strong> Enter your student number and the system will automatically retry logging in until it succeeds. Just sit back and relax!
+        </div>
+
+        <div class="form-group">
+            <label for="username">Student Number (Username)</label>
+            <input 
+                type="text" 
+                id="username" 
+                placeholder="Enter your student number" 
+                disabled
+            >
+        </div>
+
+        <div class="settings">
+            <h3>⚙️ Settings</h3>
+            <div class="settings-row">
+                <div class="settings-item">
+                    <small>Max Attempts</small>
+                    <input 
+                        type="number" 
+                        id="maxAttempts" 
+                        value="20" 
+                        min="1" 
+                        max="100"
+                        disabled
+                    >
+                </div>
+                <div class="settings-item">
+                    <small>Delay (seconds)</small>
+                    <input 
+                        type="number" 
+                        id="delay" 
+                        value="2" 
+                        min="1" 
+                        max="10"
+                        disabled
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-start" id="startBtn" onclick="enableForm()">Enable Form</button>
+            <button class="btn-reset" id="resetBtn" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="status-section">
+            <div class="status-label">📊 Status</div>
+            <div class="status-display" id="statusDisplay">
+                Waiting to start... Click "Enable Form" to begin.
+            </div>
+            <div class="attempt-counter" id="attemptCounter" style="display: none;">
+                <span class="attempt-label">Attempts:</span>
+                <span class="attempt-number" id="attemptNumber">0</span>
+            </div>
+        </div>
+
+        <div class="button-group" style="margin-top: 20px;">
+            <button class="btn-start" id="loginBtn" onclick="startLogin()" style="display: none;">Start Login Retry</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopLogin()" style="display: none;">Stop</button>
+        </div>
+    </div>
+
+    <script>
+        let isLoggingIn = false;
+        let currentAttempt = 0;
+        let maxAttempts = 20;
+        let delay = 2;
+        let formEnabled = false;
+
+        const apiUrl = "http://www.science.kln.ac.lk:8080/(S(scgdgunt5vndonnrl5tasuyb))/sfkn.aspx";
+
+        function enableForm() {
+            formEnabled = true;
+            document.getElementById('username').disabled = false;
+            document.getElementById('maxAttempts').disabled = false;
+            document.getElementById('delay').disabled = false;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('statusDisplay').innerHTML = '<span style="color: #27ae60;">✓ Form is now enabled. Enter your student number and click "Start Login Retry"</span>';
+        }
+
+        function resetForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('maxAttempts').value = '20';
+            document.getElementById('delay').value = '2';
+            document.getElementById('username').disabled = true;
+            document.getElementById('maxAttempts').disabled = true;
+            document.getElementById('delay').disabled = true;
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('attemptCounter').style.display = 'none';
+            document.getElementById('statusDisplay').innerHTML = 'Waiting to start... Click "Enable Form" to begin.';
+            isLoggingIn = false;
+            currentAttempt = 0;
+        }
+
+        async function startLogin() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (!username) {
+                updateStatus('<span class="status-error">❌ Error: Please enter your student number</span>');
+                return;
+            }
+
+            maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 20;
+            delay = parseInt(document.getElementById('delay').value) || 2;
+
+            isLoggingIn = true;
+            currentAttempt = 0;
+            document.getElementById('username').disabled = true;
+            document.getElementById('maxAttempts').disabled = true;
+            document.getElementById('delay').disabled = true;
+            document.getElementById('loginBtn').disabled = true;
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('attemptCounter').style.display = 'flex';
+
+            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Initializing login process...</span>');
+
+            while (isLoggingIn && currentAttempt < maxAttempts) {
+                currentAttempt++;
+                document.getElementById('attemptNumber').textContent = currentAttempt;
+                
+                updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Logging in as "${username}"...</span>`);
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'GET',
+                        mode: 'cors',
+                        credentials: 'include'
+                    }).catch(e => {
+                        // Try POST method if GET fails
+                        return fetch(apiUrl, {
+                            method: 'POST',
+                            mode: 'cors',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `txtUserName=${encodeURIComponent(username)}`
+                        });
+                    });
+
+                    if (response && response.ok) {
+                        const html = await response.text();
+                        
+                        // Check for success indicators
+                        if (html.includes('logout') || html.includes('sign out') || html.includes('Dashboard')) {
+                            updateStatus(`<span class="status-success">✓ LOGIN SUCCESSFUL on attempt ${currentAttempt}!</span>`);
+                            isLoggingIn = false;
+                            document.getElementById('stopBtn').style.display = 'none';
+                            document.getElementById('resetBtn').style.display = 'block';
+                            return;
+                        }
+                    }
+
+                    updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts} failed. Retrying in ${delay}s...</span>`);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts} failed. Retrying in ${delay}s...</span>`);
+                }
+
+                if (isLoggingIn && currentAttempt < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, delay * 1000));
+                }
+            }
+
+            if (isLoggingIn) {
+                updateStatus(`<span class="status-error">❌ Login failed after ${maxAttempts} attempts. Please try again later or contact IT support.</span>`);
+            }
+
+            isLoggingIn = false;
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'block';
+        }
+
+        function stopLogin() {
+            isLoggingIn = false;
+            updateStatus('<span class="status-error">⏹️ Login retry stopped by user</span>');
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'block';
+        }
+
+        function updateStatus(html) {
+            document.getElementById('statusDisplay').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
