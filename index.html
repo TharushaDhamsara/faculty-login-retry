@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty Login Retry System</title>
+    <title>Faculty Login Automation</title>
     <style>
         * {
             margin: 0;
@@ -15,30 +15,43 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
         .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-panel {
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .login-frame {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .header h1 {
             color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 26px;
+            margin-bottom: 8px;
         }
 
         .header p {
@@ -47,7 +60,7 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
@@ -61,7 +74,7 @@
         input[type="text"],
         input[type="number"] {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
@@ -77,15 +90,15 @@
         .button-group {
             display: flex;
             gap: 10px;
-            margin-top: 25px;
+            margin-top: 22px;
         }
 
         button {
             flex: 1;
-            padding: 12px;
+            padding: 11px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -96,7 +109,7 @@
             color: white;
         }
 
-        .btn-start:hover {
+        .btn-start:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
@@ -104,7 +117,6 @@
         .btn-start:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .btn-stop {
@@ -112,14 +124,8 @@
             color: white;
         }
 
-        .btn-stop:hover {
+        .btn-stop:hover:not(:disabled) {
             background: #ff5252;
-        }
-
-        .btn-stop:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: #ff6b6b;
         }
 
         .btn-reset {
@@ -132,11 +138,11 @@
         }
 
         .status-section {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 22px;
+            padding: 18px;
             background: #f8f9fa;
             border-radius: 8px;
-            min-height: 100px;
+            min-height: 120px;
         }
 
         .status-label {
@@ -159,9 +165,9 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-top: 15px;
+            margin-top: 12px;
             border-left: 4px solid #667eea;
         }
 
@@ -171,7 +177,7 @@
         }
 
         .attempt-number {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: #667eea;
         }
@@ -179,7 +185,7 @@
         .status-success {
             color: #27ae60;
             background: #d5f4e6;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-top: 10px;
             border-left: 4px solid #27ae60;
@@ -188,7 +194,7 @@
         .status-error {
             color: #e74c3c;
             background: #fadbd8;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-top: 10px;
             border-left: 4px solid #e74c3c;
@@ -197,7 +203,7 @@
         .status-info {
             color: #3498db;
             background: #d6eaf8;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-top: 10px;
             border-left: 4px solid #3498db;
@@ -205,9 +211,9 @@
 
         .settings {
             background: #ecf0f1;
-            padding: 15px;
+            padding: 14px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .settings h3 {
@@ -220,11 +226,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .settings-row:last-child {
-            margin-bottom: 0;
         }
 
         .settings-item {
@@ -240,8 +241,8 @@
 
         .loading-spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border: 3px solid #f3f3f3;
             border-top: 3px solid #667eea;
             border-radius: 50%;
@@ -262,133 +263,115 @@
             padding: 12px;
             border-radius: 8px;
             font-size: 13px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
-        @media (max-width: 600px) {
+        iframe {
+            flex: 1;
+            border: none;
+        }
+
+        .frame-label {
+            color: #666;
+            font-size: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
             .container {
-                padding: 25px;
+                grid-template-columns: 1fr;
             }
 
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .button-group {
-                flex-direction: column;
+            .login-frame {
+                min-height: 500px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎓 Faculty Login Retry</h1>
-            <p>Faculty of Science - University of Kelaniya</p>
-        </div>
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="header">
+                <h1>🤖 Login Automation</h1>
+                <p>Faculty of Science - University of Kelaniya</p>
+            </div>
 
-        <div class="info-box">
-            💡 <strong>How it works:</strong> Enter your student number and the system will automatically retry logging in until it succeeds. Just sit back and relax!
-        </div>
+            <div class="info-box">
+                💡 Enter your student number and the system will automatically login by clicking the button repeatedly until successful.
+            </div>
 
-        <div class="form-group">
-            <label for="username">Student Number (Username)</label>
-            <input 
-                type="text" 
-                id="username" 
-                placeholder="Enter your student number" 
-                disabled
-            >
-        </div>
+            <div class="form-group">
+                <label for="username">Student Number</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="e.g., PS/2022/066" 
+                >
+            </div>
 
-        <div class="settings">
-            <h3>⚙️ Settings</h3>
-            <div class="settings-row">
-                <div class="settings-item">
-                    <small>Max Attempts</small>
-                    <input 
-                        type="number" 
-                        id="maxAttempts" 
-                        value="20" 
-                        min="1" 
-                        max="100"
-                        disabled
-                    >
+            <div class="settings">
+                <h3>⚙️ Settings</h3>
+                <div class="settings-row">
+                    <div class="settings-item">
+                        <small>Max Attempts</small>
+                        <input 
+                            type="number" 
+                            id="maxAttempts" 
+                            value="30" 
+                            min="1" 
+                            max="100"
+                        >
+                    </div>
+                    <div class="settings-item">
+                        <small>Delay (seconds)</small>
+                        <input 
+                            type="number" 
+                            id="delay" 
+                            value="1" 
+                            min="1" 
+                            max="10"
+                        >
+                    </div>
                 </div>
-                <div class="settings-item">
-                    <small>Delay (seconds)</small>
-                    <input 
-                        type="number" 
-                        id="delay" 
-                        value="2" 
-                        min="1" 
-                        max="10"
-                        disabled
-                    >
+            </div>
+
+            <div class="button-group">
+                <button class="btn-start" id="startBtn" onclick="startAutomation()">Start Automation</button>
+                <button class="btn-reset" id="resetBtn" onclick="resetForm()">Reset</button>
+            </div>
+
+            <button class="btn-stop" id="stopBtn" onclick="stopAutomation()" style="display: none; width: 100%; margin-top: 10px;">Stop Automation</button>
+
+            <div class="status-section">
+                <div class="status-label">📊 Status</div>
+                <div class="status-display" id="statusDisplay">
+                    Waiting to start... Enter your student number and click "Start Automation".
+                </div>
+                <div class="attempt-counter" id="attemptCounter" style="display: none;">
+                    <span class="attempt-label">Attempts:</span>
+                    <span class="attempt-number" id="attemptNumber">0</span>
                 </div>
             </div>
         </div>
 
-        <div class="button-group">
-            <button class="btn-start" id="startBtn" onclick="enableForm()">Enable Form</button>
-            <button class="btn-reset" id="resetBtn" onclick="resetForm()">Reset</button>
-        </div>
-
-        <div class="status-section">
-            <div class="status-label">📊 Status</div>
-            <div class="status-display" id="statusDisplay">
-                Waiting to start... Click "Enable Form" to begin.
-            </div>
-            <div class="attempt-counter" id="attemptCounter" style="display: none;">
-                <span class="attempt-label">Attempts:</span>
-                <span class="attempt-number" id="attemptNumber">0</span>
-            </div>
-        </div>
-
-        <div class="button-group" style="margin-top: 20px;">
-            <button class="btn-start" id="loginBtn" onclick="startLogin()" style="display: none;">Start Login Retry</button>
-            <button class="btn-stop" id="stopBtn" onclick="stopLogin()" style="display: none;">Stop</button>
+        <!-- Login Frame -->
+        <div class="login-frame">
+            <div class="frame-label">Faculty Information System</div>
+            <iframe id="loginFrame" src="http://www.science.kln.ac.lk:8080/sfkn.aspx"></iframe>
         </div>
     </div>
 
     <script>
-        let isLoggingIn = false;
+        let isAutomating = false;
         let currentAttempt = 0;
-        let maxAttempts = 20;
-        let delay = 2;
-        let formEnabled = false;
+        let maxAttempts = 30;
+        let delay = 1;
 
-        const apiUrl = "http://www.science.kln.ac.lk:8080/(S(scgdgunt5vndonnrl5tasuyb))/sfkn.aspx";
-
-        function enableForm() {
-            formEnabled = true;
-            document.getElementById('username').disabled = false;
-            document.getElementById('maxAttempts').disabled = false;
-            document.getElementById('delay').disabled = false;
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('loginBtn').style.display = 'block';
-            document.getElementById('resetBtn').style.display = 'none';
-            document.getElementById('statusDisplay').innerHTML = '<span style="color: #27ae60;">✓ Form is now enabled. Enter your student number and click "Start Login Retry"</span>';
-        }
-
-        function resetForm() {
-            document.getElementById('username').value = '';
-            document.getElementById('maxAttempts').value = '20';
-            document.getElementById('delay').value = '2';
-            document.getElementById('username').disabled = true;
-            document.getElementById('maxAttempts').disabled = true;
-            document.getElementById('delay').disabled = true;
-            document.getElementById('startBtn').style.display = 'block';
-            document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('resetBtn').style.display = 'none';
-            document.getElementById('attemptCounter').style.display = 'none';
-            document.getElementById('statusDisplay').innerHTML = 'Waiting to start... Click "Enable Form" to begin.';
-            isLoggingIn = false;
-            currentAttempt = 0;
-        }
-
-        async function startLogin() {
+        function startAutomation() {
             const username = document.getElementById('username').value.trim();
             
             if (!username) {
@@ -396,87 +379,167 @@
                 return;
             }
 
-            maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 20;
-            delay = parseInt(document.getElementById('delay').value) || 2;
+            maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 30;
+            delay = parseInt(document.getElementById('delay').value) || 1;
 
-            isLoggingIn = true;
+            isAutomating = true;
             currentAttempt = 0;
+
             document.getElementById('username').disabled = true;
             document.getElementById('maxAttempts').disabled = true;
             document.getElementById('delay').disabled = true;
-            document.getElementById('loginBtn').disabled = true;
+            document.getElementById('startBtn').style.display = 'none';
             document.getElementById('stopBtn').style.display = 'block';
-            document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('resetBtn').style.display = 'none';
             document.getElementById('attemptCounter').style.display = 'flex';
 
-            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Initializing login process...</span>');
+            updateStatus('<span class="status-info"><span class="loading-spinner"></span>Initializing automation...</span>');
 
-            while (isLoggingIn && currentAttempt < maxAttempts) {
-                currentAttempt++;
-                document.getElementById('attemptNumber').textContent = currentAttempt;
-                
-                updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Logging in as "${username}"...</span>`);
+            setTimeout(() => performLoginAttempt(username), 500);
+        }
 
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'GET',
-                        mode: 'cors',
-                        credentials: 'include'
-                    }).catch(e => {
-                        // Try POST method if GET fails
-                        return fetch(apiUrl, {
-                            method: 'POST',
-                            mode: 'cors',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `txtUserName=${encodeURIComponent(username)}`
-                        });
-                    });
+        function performLoginAttempt(username) {
+            if (!isAutomating || currentAttempt >= maxAttempts) {
+                if (isAutomating && currentAttempt >= maxAttempts) {
+                    updateStatus(`<span class="status-error">❌ Login failed after ${maxAttempts} attempts. Please try again later.</span>`);
+                    finishAutomation();
+                }
+                return;
+            }
 
-                    if (response && response.ok) {
-                        const html = await response.text();
-                        
-                        // Check for success indicators
-                        if (html.includes('logout') || html.includes('sign out') || html.includes('Dashboard')) {
-                            updateStatus(`<span class="status-success">✓ LOGIN SUCCESSFUL on attempt ${currentAttempt}!</span>`);
-                            isLoggingIn = false;
-                            document.getElementById('stopBtn').style.display = 'none';
-                            document.getElementById('resetBtn').style.display = 'block';
-                            return;
-                        }
+            currentAttempt++;
+            document.getElementById('attemptNumber').textContent = currentAttempt;
+
+            updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Filling form and clicking button...</span>`);
+
+            try {
+                const iframeDoc = document.getElementById('loginFrame').contentDocument || 
+                                 document.getElementById('loginFrame').contentWindow.document;
+
+                if (!iframeDoc) {
+                    console.warn('Cannot access iframe content - trying again...');
+                    setTimeout(() => performLoginAttempt(username), delay * 1000);
+                    return;
+                }
+
+                // Fill username field
+                const usernameField = iframeDoc.getElementById('Usernametxt');
+                const passwordField = iframeDoc.getElementById('PasswordTxt');
+                const loginButton = iframeDoc.getElementById('LoginBt');
+
+                if (!usernameField || !passwordField || !loginButton) {
+                    console.warn('Login form fields not found');
+                    updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Retrying in ${delay}s...</span>`);
+                    setTimeout(() => performLoginAttempt(username), delay * 1000);
+                    return;
+                }
+
+                // Clear and fill the fields
+                usernameField.value = '';
+                passwordField.value = '';
+                usernameField.value = username;
+                passwordField.value = '';
+
+                // Trigger change events
+                usernameField.dispatchEvent(new Event('change', { bubbles: true }));
+                usernameField.dispatchEvent(new Event('input', { bubbles: true }));
+
+                // Click the login button
+                loginButton.click();
+
+                updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Button clicked. Retrying in ${delay}s...</span>`);
+
+                // Check for successful login after a delay
+                setTimeout(() => {
+                    checkLoginSuccess(username);
+                }, delay * 1000);
+
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts}: Retrying in ${delay}s...</span>`);
+                setTimeout(() => performLoginAttempt(username), delay * 1000);
+            }
+        }
+
+        function checkLoginSuccess(username) {
+            try {
+                const iframeDoc = document.getElementById('loginFrame').contentDocument || 
+                                 document.getElementById('loginFrame').contentWindow.document;
+
+                if (!iframeDoc) {
+                    setTimeout(() => performLoginAttempt(username), delay * 1000);
+                    return;
+                }
+
+                const pageContent = iframeDoc.body.innerText.toLowerCase();
+                const pageHtml = iframeDoc.body.innerHTML.toLowerCase();
+
+                // Check for success indicators
+                if (pageContent.includes('logout') || 
+                    pageContent.includes('sign out') || 
+                    pageContent.includes('registration') ||
+                    pageContent.includes('exam admission') ||
+                    pageHtml.includes('registration - year')) {
+                    
+                    updateStatus(`<span class="status-success">✓ LOGIN SUCCESSFUL on attempt ${currentAttempt}!</span>`);
+                    isAutomating = false;
+                    finishAutomation();
+                    return;
+                }
+
+                // Check if still on login page
+                if (pageContent.includes('user name') && pageContent.includes('password')) {
+                    // Still on login page, retry
+                    if (isAutomating && currentAttempt < maxAttempts) {
+                        performLoginAttempt(username);
                     }
-
-                    updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts} failed. Retrying in ${delay}s...</span>`);
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    updateStatus(`<span class="status-info"><span class="loading-spinner"></span>Attempt ${currentAttempt}/${maxAttempts} failed. Retrying in ${delay}s...</span>`);
+                } else {
+                    // Page changed but not sure if logged in, wait and check again
+                    setTimeout(() => {
+                        if (isAutomating) performLoginAttempt(username);
+                    }, delay * 1000);
                 }
 
-                if (isLoggingIn && currentAttempt < maxAttempts) {
-                    await new Promise(resolve => setTimeout(resolve, delay * 1000));
+            } catch (error) {
+                console.error('Error checking login:', error);
+                if (isAutomating && currentAttempt < maxAttempts) {
+                    setTimeout(() => performLoginAttempt(username), delay * 1000);
                 }
             }
+        }
 
-            if (isLoggingIn) {
-                updateStatus(`<span class="status-error">❌ Login failed after ${maxAttempts} attempts. Please try again later or contact IT support.</span>`);
-            }
+        function stopAutomation() {
+            isAutomating = false;
+            updateStatus('<span class="status-error">⏹️ Automation stopped by user</span>');
+            finishAutomation();
+        }
 
-            isLoggingIn = false;
-            document.getElementById('loginBtn').disabled = false;
+        function finishAutomation() {
+            document.getElementById('username').disabled = false;
+            document.getElementById('maxAttempts').disabled = false;
+            document.getElementById('delay').disabled = false;
+            document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
             document.getElementById('resetBtn').style.display = 'block';
         }
 
-        function stopLogin() {
-            isLoggingIn = false;
-            updateStatus('<span class="status-error">⏹️ Login retry stopped by user</span>');
-            document.getElementById('loginBtn').disabled = false;
+        function resetForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('maxAttempts').value = '30';
+            document.getElementById('delay').value = '1';
+            document.getElementById('username').disabled = false;
+            document.getElementById('maxAttempts').disabled = false;
+            document.getElementById('delay').disabled = false;
+            document.getElementById('startBtn').style.display = 'block';
             document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('resetBtn').style.display = 'block';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('attemptCounter').style.display = 'none';
+            document.getElementById('statusDisplay').innerHTML = 'Waiting to start... Enter your student number and click "Start Automation".';
+            isAutomating = false;
+            currentAttempt = 0;
+            
+            // Reload the iframe
+            document.getElementById('loginFrame').src = document.getElementById('loginFrame').src;
         }
 
         function updateStatus(html) {
